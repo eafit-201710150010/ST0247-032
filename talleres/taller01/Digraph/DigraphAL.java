@@ -21,19 +21,22 @@ public class DigraphAL extends Digraph {
     }
 
     public void addArc(int source, int destination, int weight) {
-        for (Pair pair : arraylist.get(source)) {
-            if(destination > (int)pair.first){
-               arraylist.get(source).add(new Pair(destination, weight));
+        ArrayList<Pair> vertice = arraylist.get(source);
+	//para añadir en orden
+	int pos = 0;
+        for (; pos < vertice.size(); pos++) {
+            if(destination < (int) vertice.get(pos).first){
+                break;
             }
         }
-       
+        vertice.add(pos,new Pair(destination, weight));
     }
 
     public ArrayList<Integer> getSuccessors(int vertex) {
         ArrayList<Integer> retornar = new ArrayList<>();
 
         for (Pair pair : arraylist.get(vertex)) {
-            retornar.add((int)pair.first);
+            retornar.add((int) pair.first);
         }
         if (retornar.isEmpty()) {
             return null;
@@ -44,7 +47,7 @@ public class DigraphAL extends Digraph {
     public int getWeight(int source, int destination) {
         ArrayList<Integer> retornar = new ArrayList<>();
         for (Pair pair : arraylist.get(source)) {
-            if ((int)pair.first == destination) {
+            if ((int) pair.first == destination) {
                 return (int) pair.second;
             }
         }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Clase abstracta para la implementacion de grafos dirigidos
  *
- * @author Mauricio Toro, Mateo Agudelo
+ * @author Mauricio Toro, Mateo Agudelo, Alejandro Arroyave, Santiago Castrillon, Luis Javier Palacio
  */
 public abstract class Digraph {
    

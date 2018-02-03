@@ -1,6 +1,6 @@
 package digraph;
 
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Implementacion de un grafo dirigido usando listas de adyacencia
@@ -9,19 +9,19 @@ import java.util.ArrayList;
  */
 public class DigraphAL extends Digraph {
 
-    ArrayList<ArrayList<Pair>> arraylist;
+    LinkedList<LinkedList<Pair>> arraylist;
 
     public DigraphAL(int size) {
         super(size);
-        arraylist = new ArrayList<>();
+        arraylist = new LinkedList<>();
         for (int i = 0; i < size; i++) {
-            ArrayList<Pair> pair = new ArrayList<>();
+            LinkedList<Pair> pair = new LinkedList<>();
             arraylist.add(pair);
         }
     }
 
     public void addArc(int source, int destination, int weight) {
-        ArrayList<Pair> vertice = arraylist.get(source);
+        LinkedList<Pair> vertice = arraylist.get(source);
 	//para añadir en orden
 	int pos = 0;
         for (; pos < vertice.size(); pos++) {

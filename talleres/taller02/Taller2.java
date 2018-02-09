@@ -78,18 +78,14 @@ public class Taller2 {
      public static boolean esValido(Integer[] tablero) {
         boolean yaEsta[] = new boolean[tablero.length];
         for (int i = 0; i < tablero.length; i++) {
-            int posReina = tablero[i];
-            if (yaEsta[posReina]) {
+            if (yaEsta[tablero[i]])
                 return false;
-            }
-            yaEsta[posReina] = true;
+            yaEsta[tablero[i]] = true;
         }
-
         for (int i = 1; i < tablero.length ; i++) {
             for (int j = 0; j < i; j++) {
-                if (Math.abs(tablero[i]-tablero[j]) == Math.abs(i-j)) {
+                if (Math.abs(tablero[i]-tablero[j]) == Math.abs(i-j))
                     return false;
-                }
             }
         }
         return true;
@@ -112,27 +108,15 @@ public class Taller2 {
 
     public static int queens(int n) {
         int [] rango = new int [n];
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
             rango[i] = i;
-        }
         ArrayList<ArrayList<Integer>> list = new ArrayList<>();
         generarArreglos("", rango, list,0);
         int cont = 0;
-
         for (ArrayList<Integer> arreglo : list) {        
-            if(esValido(arreglo.toArray(new Integer[n]))){
-             cont++;   
-            }
+            if(esValido(arreglo.toArray(new Integer[n])))
+             cont++;            
         }
         return cont;
     }
-//    
-//    public static int [] toArray(int n){
-//        String ne = n + "";
-//        int [] list = new int[ne.length()];
-//            for (int i = 0; i < 10; i++) {
-//                String s  = list[i];
-//                list[i]= ne.charAt(i).toInt();
-//            }
-//    }
 }

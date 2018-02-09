@@ -1,6 +1,7 @@
 package taller2;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import static taller2.Taller2.esValido;
 
 /**
@@ -13,10 +14,7 @@ public class Taller2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        combinations("abc");
-//        permutations("abc");
-          //int [] lista = {2,0,3,1};
-          //System.out.println(esValido(lista));
+
           System.out.println(queens(4));
           
     }
@@ -76,18 +74,9 @@ public class Taller2 {
  
   
      public static boolean esValido(Integer[] tablero) {
-        boolean yaEsta[] = new boolean[tablero.length];
-        for (int i = 0; i < tablero.length; i++) {
-            int posReina = tablero[i];
-            if (yaEsta[posReina]) {
-                return false;
-            }
-            yaEsta[posReina] = true;
-        }
-
-        for (int i = 1; i < tablero.length ; i++) {
-            for (int j = 0; j < i; j++) {
-                if (Math.abs(tablero[i]-tablero[j]) == Math.abs(i-j)) {
+        for (int i = 0; i < tablero.length-1; ++i) {
+            for (int j = i +1; j < tablero.length; j++) {
+                if (Math.abs(tablero[i]-tablero[j]) == Math.abs(i-j) || Objects.equals(tablero [i], tablero[j]) ) {
                     return false;
                 }
             }
@@ -96,29 +85,28 @@ public class Taller2 {
     }
 
 
-    private static void generarArreglos(String pre, int [] rango, ArrayList<ArrayList<Integer>> list,int indice) {
-        if (indice == rango.length) {
+    private static void generarArreglos(String pre, String rango, ArrayList<ArrayList<Integer>> list) {
+        if (rango.length() == 0) {
             ArrayList <Integer> arreglo = new ArrayList<>();
             list.add(arreglo);
-            for (int i =0; i < rango.length; i++){
+            for (int i =0; i < pre.length(); i++){
                 arreglo.add(Integer.parseInt(pre.substring(i, i+1)));
             }
         } else {
-            for (int i = 0; i < rango.length; i++) {
-                generarArreglos(pre + rango[i], rango, list,indice + 1);
+            for (int i = 0; i < rango.length(); i++) {
+                generarArreglos(pre + rango.charAt(i), rango.substring(0,i) + rango.substring(i+1), list);
             }
         }
     }
 
     public static int queens(int n) {
-        int [] rango = new int [n];
+        String rango = "";
         for (int i = 0; i < n; i++) {
-            rango[i] = i;
+            rango += i;
         }
         ArrayList<ArrayList<Integer>> list = new ArrayList<>();
-        generarArreglos("", rango, list,0);
+        generarArreglos("", rango, list);
         int cont = 0;
-
         for (ArrayList<Integer> arreglo : list) {        
             if(esValido(arreglo.toArray(new Integer[n]))){
              cont++;   
@@ -126,13 +114,4 @@ public class Taller2 {
         }
         return cont;
     }
-//    
-//    public static int [] toArray(int n){
-//        String ne = n + "";
-//        int [] list = new int[ne.length()];
-//            for (int i = 0; i < 10; i++) {
-//                String s  = list[i];
-//                list[i]= ne.charAt(i).toInt();
-//            }
-//    }
 }

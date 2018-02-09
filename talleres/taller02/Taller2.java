@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package taller2;
 
 import java.util.ArrayList;
+import static taller2.Taller2.esValido;
 
 /**
  *
@@ -19,8 +15,10 @@ public class Taller2 {
     public static void main(String[] args) {
 //        combinations("abc");
 //        permutations("abc");
-          int [] lista = {2,1,0};
-          System.out.println(esValido(lista));
+          //int [] lista = {2,0,3,1};
+          //System.out.println(esValido(lista));
+          System.out.println(queens(4));
+          
     }
 
     //Punto 1
@@ -75,7 +73,9 @@ public class Taller2 {
         System.out.println();
     }
 
-    public static boolean esValido(int[] tablero) {
+ 
+  
+     public static boolean esValido(Integer[] tablero) {
         boolean yaEsta[] = new boolean[tablero.length];
         for (int i = 0; i < tablero.length; i++) {
             int posReina = tablero[i];
@@ -84,9 +84,10 @@ public class Taller2 {
             }
             yaEsta[posReina] = true;
         }
-        for (int i = 0; i < tablero.length - 1; i++) {
-            for (int j = 0; j < tablero.length - 1; j++) {
-                if (Math.abs(tablero[i] - tablero[j]) == j - 1) {
+
+        for (int i = 1; i < tablero.length ; i++) {
+            for (int j = 0; j < i; j++) {
+                if (Math.abs(tablero[i]-tablero[j]) == Math.abs(i-j)) {
                     return false;
                 }
             }
@@ -94,29 +95,44 @@ public class Taller2 {
         return true;
     }
 
-     private static void queens(String pre, String pos, ArrayList<String> list) {
-        if (pos.length() == 0) {
-            list.add(pre);
+
+    private static void generarArreglos(String pre, int [] rango, ArrayList<ArrayList<Integer>> list,int indice) {
+        if (indice == rango.length) {
+            ArrayList <Integer> arreglo = new ArrayList<>();
+            list.add(arreglo);
+            for (int i =0; i < rango.length; i++){
+                arreglo.add(Integer.parseInt(pre.substring(i, i+1)));
+            }
         } else {
-            for (int i = 0; i < pos.length(); i++) {
-                queens(pre + pos.charAt(i), pos, list);
+            for (int i = 0; i < rango.length; i++) {
+                generarArreglos(pre + rango[i], rango, list,indice + 1);
             }
         }
     }
+
     public static int queens(int n) {
-        ArrayList<String> list = new ArrayList<>();
-        String reina = n + "";
-        queens("", reina, list);
-        
- 
-    }
-    
-    public static int [] toArray(int n){
-        String ne = n + "";
-        int [] list = new int[ne.length()];
-            for (int i = 0; i < 10; i++) {
-                String s  = list[i];
-                list[i]= ne.charAt(i).toInt();
+        int [] rango = new int [n];
+        for (int i = 0; i < n; i++) {
+            rango[i] = i;
+        }
+        ArrayList<ArrayList<Integer>> list = new ArrayList<>();
+        generarArreglos("", rango, list,0);
+        int cont = 0;
+
+        for (ArrayList<Integer> arreglo : list) {        
+            if(esValido(arreglo.toArray(new Integer[n]))){
+             cont++;   
             }
+        }
+        return cont;
     }
+//    
+//    public static int [] toArray(int n){
+//        String ne = n + "";
+//        int [] list = new int[ne.length()];
+//            for (int i = 0; i < 10; i++) {
+//                String s  = list[i];
+//                list[i]= ne.charAt(i).toInt();
+//            }
+//    }
 }

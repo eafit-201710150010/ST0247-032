@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lab1;
+package EjercicioEnLinea;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
-import lab1.Pair;
 
 /**
  *
@@ -17,14 +15,16 @@ import lab1.Pair;
  */
 public class BicolorableGraph {
 
-    static LinkedList<LinkedList<Pair>> list;
+    static LinkedList<LinkedList<Integer>> list;
     static int[] arr;
+    static int color = 1;
 
     public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
         while (true) {
-            Scanner in = new Scanner(System.in);
             int vertex = in.nextInt();
             if (vertex == 0) {
+                System.out.println();
                 break;
             }
             int aristas = in.nextInt();
@@ -35,11 +35,12 @@ public class BicolorableGraph {
                 int destino = in.nextInt();
                 graph.addArc(origen, destino);
             }
+            
             arr[0] = 1;
-            if(graph.Bicolorable(1, 0)){
-                System.out.println("NOT BICOLORABLE.");
-            } else{
+            if (graph.Bicolorable()) {
                 System.out.println("BICOLORABLE.");
+            } else {
+                System.out.println("NOT BICOLORABLE.");
             }
         }
     }
@@ -47,49 +48,41 @@ public class BicolorableGraph {
     public BicolorableGraph(int size) {
         list = new LinkedList<>();
         for (int i = 0; i < size; i++) {
-            LinkedList<Pair> pair = new LinkedList<>();
-            list.add(pair);
+            LinkedList<Integer> integer = new LinkedList<>();
+            list.add(integer);
         }
     }
 
     public void addArc(int source, int destination) {
-        LinkedList<Pair> vertice = list.get(source);
+        LinkedList<Integer> vertice = list.get(source);
         //para añadir en orden
         int pos = 0;
         for (; pos < vertice.size(); pos++) {
-            if (destination < (int) vertice.get(pos).first) {
+            if (destination < vertice.get(pos)) {
                 break;
             }
         }
-        vertice.add(pos, new Pair(destination, 1));
+        vertice.add(pos, destination);
     }
 
     public ArrayList<Integer> getSuccessors(int vertex) {
         ArrayList<Integer> retornar = new ArrayList<>();
 
-        for (Pair pair : list.get(vertex)) {
-            retornar.add((int) pair.first);
-        }
-        if (retornar.isEmpty()) {
-            return null;
+        for (Integer integer : list.get(vertex)) {
+            retornar.add(integer);
         }
         return retornar;
     }
 
-    public boolean Bicolorable(int color, int vertex) {
-        ArrayList<Integer> vecinos = getSuccessors(vertex);
-        if (vecinos == null) {
-            return true;
-        }
-        for (Integer integer : vecinos) {
-            if (arr[integer] == color) {
-                return false;
-            } else if (arr[integer] != 0) {
-                return true;
-            } else {
-                color = color == 1 ? 2 : 1;
+    public boolean Bicolorable() {
+        for (int i = 0; i < list.size(); i++) {
+            ArrayList<Integer> vecinos = getSuccessors(i);
+            color = arr[i] == 1 ? 2 : 1;
+            for (Integer integer : vecinos) {
+                if (arr[integer] == arr[i] && arr[i] != 0) {
+                    return false;
+                }         
                 arr[integer] = color;
-                return Bicolorable(color, integer);
             }
         }
         return true;

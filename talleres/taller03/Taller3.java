@@ -1,7 +1,5 @@
 package Taller3;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -21,33 +19,27 @@ public class Taller3 {
 //	private static int nReinas(int r, int n, int[] tablero) {
 //		// complete...
 //	}
-    private static void imprimirSolu(String rango,Integer[] tablero,int fila) {
-            if (rango.length() == 0) {     
+    private static void nReinas (String rango,int[] tablero,int fila) {
+            if (rango.length() == 0) {
                 imprimirTablero(tablero);
             } else {
                 for (int i = 0; i < rango.length(); i++) {
-                    if(esValido(tablero, fila, Integer.parseInt(rango.substring(i,i+1)))){
-                      fila++;
-                      imprimirSolu(rango.substring(0, i) + rango.substring(i + 1), tablero,fila);
-                    } else{
-                        rango = rango.substring(0, i) + rango.substring(i + 1);
-                    }
+                    if(puedoPonerReina(tablero, fila, Integer.parseInt(rango.charAt(i) + ""))){
+                      nReinas(rango.substring(0, i) + rango.substring(i + 1), tablero,fila +1);
+                    } 
                 }
             }
     }
 
-    public static void queens(int n) {
+    public static void nReinas(int n) {
         String rango = "";
         for (int i = 0; i < n; i++) {
             rango += i;
         }
-        Integer [] tablero = new Integer[n];
-        for (int i = 0; i < tablero.length; i++) {
-            tablero[i] = 0;
-        }
-        imprimirSolu(rango, tablero,0);  
+
+        nReinas(rango, new int[n],0);  
     }
-    public static boolean esValido(Integer[] tablero, int fila, int col) {
+    public static boolean puedoPonerReina(int[] tablero, int fila, int col) {
             tablero[fila] = col;
             for (int j = fila-1; j >= 0; j--) {
                 if (Math.abs(tablero[fila] - tablero[j]) == Math.abs(fila - j) || Objects.equals(tablero[fila], tablero[j])) {
@@ -57,7 +49,7 @@ public class Taller3 {
         return true;
     }
 
-    public static void imprimirTablero(Integer[] tablero) {
+    public static void imprimirTablero(int[] tablero) {
         int n = tablero.length;
         System.out.print("    ");
         for (int i = 0; i < n; ++i) {
@@ -75,9 +67,7 @@ public class Taller3 {
     }
 
     public static void main(String[] args) {
-
-        queens(4);
-
+        nReinas(5);
     }
 
 //    public static ArrayList<Integer> camino(Digraph g, int inicio, int fin) {

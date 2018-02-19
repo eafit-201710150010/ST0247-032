@@ -87,4 +87,20 @@ public class BicolorableGraph {
         }
         return true;
     }
+    /** Bicolorable con recursion
+     public boolean Bicolorable(int vertex) {
+        ArrayList<Integer> vecinos = getSuccessors(vertex);
+        color = arr[vertex] == 1 ? 2 : 1;
+        for (Integer integer : vecinos) {
+            if (arr[integer] == arr[vertex]) {
+                return false;
+            }
+            if(arr[integer] != color){
+            arr[integer] = color;
+            return Bicolorable(integer);
+            }
+        }
+        return true;
+    }
+*/
 }

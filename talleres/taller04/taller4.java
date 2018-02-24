@@ -47,13 +47,12 @@ public class Taller4 {
         g1.addArc(4, 6, 30);
         g1.addArc(5, 2, 10);
         g1.addArc(5, 3, 40);
-        g1.addArc(5, 0, 0);
         g1.addArc(6, 0, 20);
         g1.addArc(0, 6, 90);
         g1.addArc(0, 1, 20);
         g1.addArc(0, 3, 80);
 
-        System.out.println(costoMinimo(g1, 2, 0));
+        System.out.println(costoMinimo(g1, 5, 0));
     }
 
     public static ArrayList<Integer> recorridoDfs(Digraph g, int start) {
@@ -153,6 +152,9 @@ public class Taller4 {
 
     public static int costoMinimo(Digraph g, int inicio, int fin) {
         int costo[] = new int[g.size];
+        for (int i = 0; i < costo.length; i++) {
+            costo[i] = -1;
+        }
         costoMinimo(g, inicio, costo, 0);
         return costo[fin];
     }
@@ -162,12 +164,24 @@ public class Taller4 {
         if (sucesores != null) {
             for (Integer sucesor : sucesores) {
                 int peso = g.getWeight(inicio, sucesor);
-                if (costo[sucesor] == 0 || costo[sucesor] > acum+peso) {
+                if (costo[sucesor] == -1 || costo[sucesor] > acum+peso) {
                     costo[sucesor] = acum + peso;
                     costoMinimo(g, sucesor, costo, acum + peso);
                 }
             }
         }
     }
-
+    private static void recorrido(Digraph g, int start, boolean[] isVisited) {
+        isVisited[start] = true;
+        ArrayList<Integer> sucesores = g.getSuccessors(start);
+        if (sucesores == null) {
+            return;
+        }
+        for (Integer sucesor : sucesores) {
+            if (!isVisited[sucesor]) {
+                recorrido(g, sucesor, isVisited);
+                isVisited[start] = false;
+            }
+        }
+    }
 }

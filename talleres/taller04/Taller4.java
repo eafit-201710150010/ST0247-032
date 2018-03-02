@@ -1,10 +1,9 @@
 package taller4;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
-import javafx.scene.shape.Arc;
+
 
 /**
  * Clase en la cual se implementan los metodos del Taller de Clase #4
@@ -13,32 +12,7 @@ import javafx.scene.shape.Arc;
  */
 public class Taller4 {
 
-//	public static int recorrido(Digraph g) {
-//		// complete...
-//	}
-//
-//
-//	// recomendacion
-//	private static int recorrido(Digraph g, int v, int[] unvisited) {
-//            
-//	}
-//        
-//	// recomendacion
-//	private static int[] removeAt(int k, int a[]) {
-//		// complete...
-//	}
-//
-//	public static int costoMinimo(Digraph g, int inicio, int fin) {
-//		// complete...
-//	}
-//
-//	// recomendacion
-//	private static void dfs(Digraph g, int v, int[] costo) {
-//		// complete...
-//	}
-    //1
     static int menor;
-
     public static void main(String[] args) {
 
 DigraphAL g = new DigraphAL(8);

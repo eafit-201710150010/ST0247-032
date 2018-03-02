@@ -1,8 +1,10 @@
 package taller4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import javafx.scene.shape.Arc;
 
 /**
  * Clase en la cual se implementan los metodos del Taller de Clase #4
@@ -35,25 +37,28 @@ public class Taller4 {
 //		// complete...
 //	}
     //1
-    public static void main(String[] args) {
-        DigraphAL g1 = new DigraphAL(8);
-        g1.addArc(1, 5, 10);
-        g1.addArc(2, 3, 10);
-        g1.addArc(2, 5, 20);
-        g1.addArc(2, 7, 20);
-        g1.addArc(3, 2, 10);
-        g1.addArc(3, 6, 20);
-        g1.addArc(4, 1, 50);
-        g1.addArc(4, 6, 30);
-        g1.addArc(5, 2, 10);
-        g1.addArc(5, 3, 40);
-        g1.addArc(5, 0, 0);
-        g1.addArc(6, 0, 20);
-        g1.addArc(0, 6, 90);
-        g1.addArc(0, 1, 20);
-        g1.addArc(0, 3, 80);
+    static int menor;
 
-        System.out.println(costoMinimo(g1, 2, 0));
+    public static void main(String[] args) {
+
+DigraphAL g = new DigraphAL(8);
+		g.addArc(1, 5, 10);
+		g.addArc(0, 1, 20);
+		g.addArc(4, 1, 50);
+		g.addArc(4, 6, 30);
+		g.addArc(0, 6, 90);
+		g.addArc(6, 0, 20);
+		g.addArc(0, 3, 80);
+		g.addArc(5, 3, 40);
+		g.addArc(3, 6, 20);
+		g.addArc(5, 2, 10);
+		g.addArc(2, 5, 50);
+		g.addArc(3, 2, 10);
+		g.addArc(2, 3, 10);
+		g.addArc(2, 7, 20);
+		
+
+        System.out.println(costoMinimo(g, 0, 0));
     }
 
     public static ArrayList<Integer> recorridoDfs(Digraph g, int start) {
@@ -153,6 +158,10 @@ public class Taller4 {
 
     public static int costoMinimo(Digraph g, int inicio, int fin) {
         int costo[] = new int[g.size];
+        for (int i = 0; i < costo.length; i++) {
+            costo[i] = -1;
+        }
+        if(inicio == fin) return 0;
         costoMinimo(g, inicio, costo, 0);
         return costo[fin];
     }
@@ -162,11 +171,47 @@ public class Taller4 {
         if (sucesores != null) {
             for (Integer sucesor : sucesores) {
                 int peso = g.getWeight(inicio, sucesor);
-                if (costo[sucesor] == 0 || costo[sucesor] > acum+peso) {
+                if (costo[sucesor] == -1 || costo[sucesor] > acum + peso) {
                     costo[sucesor] = acum + peso;
                     costoMinimo(g, sucesor, costo, acum + peso);
                 }
             }
+        }
+    }
+
+    public static int recorrido(Digraph g) {
+        int arr[] = new int[g.size];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = i;
+        }
+        menor = peso(g, arr);
+        recorrido(g, arr,0);
+        return menor;
+    }
+
+    private static void cambiar(int[] arr, int i, int k) {
+        int t = arr[i];
+        arr[i] = arr[k];
+        arr[k] = t;
+    }
+
+    private static int peso(Digraph g, int[] arr) {
+        int acum = 0;
+        for (int i = 0; i < g.size - 1; i++) {
+            acum += g.getWeight(arr[i], arr[i + 1]);
+        }
+        return acum += g.getWeight(arr[arr.length - 1], arr[0]);
+    }
+
+    static void recorrido(Digraph g, int[] arr, int start) {
+        for (int i = start; i < arr.length; i++) {
+            cambiar(arr, i, start);
+            int peso = peso(g, arr);
+            if (peso < menor) {
+                menor = peso;
+            }
+            recorrido(g, arr, start + 1);
+            cambiar(arr, start, i);
         }
     }
 

@@ -50,8 +50,8 @@ public class Taller5 {
     private static boolean mColoring(Digraph g, int v, int[] colors, int m) {
         if (v == colors.length) return true;
         for (int i=0; i < m; i++){ 
-            if(isSafe(g,colors[i],colors,i)){
-              return mColoring(g, v + 1, colors, m);
+            if(isSafe(g,colors[i],colors,i) && mColoring(g,v+1,colors,m)){
+		return true;
             }
         }
            return false;

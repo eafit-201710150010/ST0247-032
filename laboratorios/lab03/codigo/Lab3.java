@@ -5,17 +5,42 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ *
+ * @author ljpalaciom
+ */
 public class Lab3 {
 
     /**
      * @param args the command line arguments
      */
+    static Pair ruta;
+
     public static void main(String[] args) {
         System.out.println("Punto 1.1 con 4 reinas: ");
         System.out.println(Arrays.toString(nReinas(4)));
+        System.out.println("Punto 1.5 ");
+        DigraphAL g = new DigraphAL(8);
+        g.addArc(1, 3, 0);
+        g.addArc(3, 6, 0);
+        g.addArc(6, 1, 0);
+        System.out.println(esSinCiclosBfs(g));
+        System.out.println("Punto 1.6");
+
+        Digraph g1 = new DigraphAL(6);
+        g1.addArc(1, 2, 2); 
+        g1.addArc(2, 5, 5);
+        g1.addArc(2, 3, 4);
+        g1.addArc(1, 4, 1);
+        g1.addArc(4, 3, 3);
+        g1.addArc(3, 5, 1);
+
+        System.out.println(costoMinimo(g1, 1, 5));
+
         System.out.println("Punto 5: ");
         System.out.println("“ABCDGH” y “AEDFHR”: " + lcs("ABCDGH", "AEDFHR"));  //"ADH" 3
         System.out.println("“AGGTAB” y “GXTXAYB”: " + lcs("AGGTAB", "GXTXAYB")); //"GTAB" 4
+
     }
 
     //Punto 1.1
@@ -62,6 +87,37 @@ public class Lab3 {
         return retornar;
     }
 
+    //Punto 1.5
+    public static boolean esSinCiclosBfs(Digraph g) {
+        for (int i = 0; i < g.size; i++) {
+            if (hayCaminoBfs(g, i, i, new boolean[g.size])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean hayCaminoBfs(Digraph g, int start, int target, boolean[] isVisited) {
+        Queue<Integer> cola = new LinkedList();
+        cola.add(start);
+        ArrayList<Integer> sucesores;
+        while (!cola.isEmpty()) {
+            sucesores = g.getSuccessors(cola.remove());
+            if (sucesores != null) {
+                for (Integer sucesor : sucesores) {
+                    if (sucesor == target) {
+                        return true;
+                    }
+                    if (!isVisited[sucesor]) {
+                        isVisited[sucesor] = true;
+                        cola.add(sucesor);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private static void bfs(Digraph g, int start, boolean[] isVisited, ArrayList<Integer> lista) {
         Queue<Integer> cola = new LinkedList();
         cola.add(start);
@@ -81,33 +137,43 @@ public class Lab3 {
             }
         }
     }
+
     //punto 1.6
-
-    public static ArrayList<Integer> caminoCorto(Digraph g, int inicio, int fin) {
-        boolean[] visitados = new boolean[g.size()];
-        ArrayList<Integer> list = new ArrayList<>();
-        list.add(inicio);
-        if (dfs(g, inicio, fin, visitados, list)) {
-            return list;
+    public static ArrayList<Integer> costoMinimo(Digraph g, int inicio, int fin) {
+        int costo[] = new int[g.size];
+        for (int i = 0; i < costo.length; i++) {
+            costo[i] = Integer.MAX_VALUE;
         }
-        return null;
-
+        costo[inicio] = 0;
+        ArrayList<Integer> lista = new ArrayList<>();
+        lista.add(inicio);
+        dfs(g, inicio, fin, costo, lista, 0);
+        System.out.println(ruta.second);
+        return (ArrayList<Integer>) ruta.first;
     }
 
-    private static boolean dfs(Digraph g, int nodo, int objetivo, boolean[] visitados, ArrayList<Integer> list) {
+    private static void dfs(Digraph g, int nodo, int objetivo, int[] costo, ArrayList<Integer> list, int acum) {
         ArrayList<Integer> sucesores = g.getSuccessors(nodo);
-        visitados[nodo] = true;
+        if (nodo == objetivo) {
+            Pair pair = new Pair(list.clone(), acum);
+            if (ruta == null) {
+                ruta = pair;
+            } else if ((int) pair.second < (int) ruta.second) {
+                ruta = pair;
+            }
+            return;
+        }
         if (sucesores != null) {
             for (Integer sucesor : sucesores) {
-                list.add(sucesor);
-                if (!visitados[sucesor] && (sucesor == objetivo || dfs(g, sucesor, objetivo, visitados, list))) {
-                    return true;
-                } else {
+                int peso = g.getWeight(nodo, sucesor);
+                if (costo[sucesor] > acum + peso) {
+                    list.add(sucesor);
+                    costo[sucesor] = acum + peso;
+                    dfs(g, sucesor, objetivo, costo, list, acum + peso);
                     list.remove(list.size() - 1);
                 }
             }
         }
-        return false;
     }
 
     //Punto 5.

@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Lab3;
+
 
 import java.util.ArrayList;
+import lab3.*;
+import static lab3.Lab3.costoMinimo;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -109,10 +111,8 @@ public class Lab3Test {
         int fin = 3;
         ArrayList<Integer> expResult = new ArrayList<>();
         expResult.add(0);
-        ArrayList<Integer> result = Lab3.caminoCorto(g, inicio, fin);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ArrayList<Integer> result = costoMinimo(g, inicio, fin);
+
     }
 
     /**
@@ -121,13 +121,11 @@ public class Lab3Test {
     @Test
     public void testLcs() {
         System.out.println("lcs");
-        String s1 = "";
-        String s2 = "";
-        int expResult = 0;
+        String s1 = "ABCDGH";
+        String s2 = "AEDFHR";
+        int expResult = 3;
         int result = Lab3.lcs(s1, s2);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
     
 }

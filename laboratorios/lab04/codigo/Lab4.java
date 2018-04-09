@@ -14,11 +14,22 @@ import java.util.ArrayList;
 public class Lab4 {
    
     static int acum;
+    /**
+     * Este algoritmo devuelve el costo de una solución voraz (vecino mas cercano) al problema del agente viajero de un grafo g
+     * @param g Es el grafo a analizar
+     * @return Un entero que es el costo de la ruta 
+     */
     public static int costoTSP(Digraph g) {
         elVecinoMasCercanoParaTSP(g);
         return acum;
     }
 
+     /**
+     * Este algoritmo devuelve una ruta que es solución al problema del agente viajero. Está basada en el algoritmo voraz 
+     * el vecino más cercano
+     * @param g Es el grafo a analizar
+     * @return Un arraylist de enteros que representa la ruta que pasa por todos los vértices.
+     */
     public static ArrayList<Integer> elVecinoMasCercanoParaTSP(Digraph g) {
         int nodoDeposito = 0;
         ArrayList<Integer> lista = new ArrayList<>();

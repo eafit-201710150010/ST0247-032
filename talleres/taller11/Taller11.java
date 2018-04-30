@@ -10,41 +10,46 @@ import java.util.LinkedList;
  * @author Mauricio Toro, Mateo Agudelo
  */
 public class Taller11 {
-
+      
     public static int heldKarp(Digraph g) {
         int n = g.size;
         int numSub = (int) Math.pow(2, n - 1);
         int pesos[][] = new int[n][numSub];
         LinkedList<BitmaskSet> subconjuntos = new LinkedList<>();
 
-        combinations(n, subconjuntos, new ArrayList());
-        for (int i = 0; i < n; ++i) {
-            for (BitmaskSet sub1: subconjuntos) {
+        combinations(n - 1, subconjuntos, new ArrayList());
+
+        for (BitmaskSet sub1 : subconjuntos) {
+            for (int i = n - 1; i >= 0; --i) {
                 int min = Integer.MAX_VALUE;
-                String binary = Integer.toBinaryString(sub1.mask());
+                int porDonde = 1;
                 for (BitmaskSet sub2 : subconjuntos) {
-                    String actual = Integer.toBinaryString(sub2.mask());
+                    if (sub1.length() <= sub2.length()) {
+                        continue;
+                    }
                     int acum = 0;
-                    for (int k = binary.length() - 1, j = actual.length() - 1; k >= 0 && j >= 0; ++k, ++j) {
-                        if (binary.charAt(k) == '1' && actual.charAt(j) == '1') {
+                    for (int k = 1; k < n; k++) {
+                        if (sub1.contains(k) && sub2.contains(k)) {
                             acum++;
+                        } else if (sub1.contains(k)) {
+                            porDonde = k;
                         }
                     }
-                    if (acum == sub1.length() -1) {
+                    if (acum == sub1.length() - 1) {
+                        int valor = pesos[porDonde][sub2.mask() / 2] + g.getWeight(porDonde, i);
+                        if (valor < min) {
+                            min = valor;
+                        }
                     }
                 }
-
+                if (min == Integer.MAX_VALUE) {
+                    pesos[i][sub1.mask() / 2] = g.getWeight(0, i);
+                } else {
+                    pesos[i][sub1.mask() / 2] = min;
+                }
             }
         }
-        return 0;
-    }
-
-    public static void main(String[] args) {
-        LinkedList<BitmaskSet> subconjuntos = new LinkedList<>();
-        combinations(3, subconjuntos, new ArrayList());
-        for (BitmaskSet subconjunto : subconjuntos) {
-            System.out.println(Integer.toBinaryString(subconjunto.mask()).length());
-        }
+        return pesos[0][numSub - 1];
     }
 
     public static void combinations(int n, LinkedList<BitmaskSet> subconjuntos, ArrayList<Integer> actual) {
@@ -68,4 +73,5 @@ public class Taller11 {
             combinations(n - 1, subconjuntos, actual);
         }
     }
+    
 }

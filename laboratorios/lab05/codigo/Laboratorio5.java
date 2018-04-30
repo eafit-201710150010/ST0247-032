@@ -63,37 +63,52 @@ public class Laboratorio5 {
      */
     public static int lcs(String a, String b) {
         int[][] tabla = new int[a.length() + 1][b.length() + 1];
-        for (int i = 0; i <= a.length(); i++) {
-            tabla[i][0] = 0;
-        }
-        for (int j = 0; j <= b.length(); j++) {
-            tabla[0][j] = 0;
-        }
-        // Voy a hacer ciclos
         for (int i = 1; i <= a.length(); i++) {
             for (int j = 1; j <= b.length(); j++) {
-                if (a.charAt(i-1) == b.charAt(j-1)) {
+                if (a.charAt(i - 1) == b.charAt(j - 1)) {
                     tabla[i][j] = tabla[i - 1][j - 1] + 1;
-                } else // no son iguales
-                {
-                    
+                } else {
                     tabla[i][j] = Math.max(tabla[i - 1][j],
                             tabla[i][j - 1]);
                 }
             }
         }
-        int actual = 0;
-        String result = "";
+        return tabla[a.length()][b.length()];
+    }
+    
+    /**
+     * Encuentra la subsecuencia mas larga presente en ambas cadenas.
+     * @param a Cadena 1 a comparar
+     * @param b Cadena 2 a comparar
+     * @return La subsecuencia mas larga encontrada en ambas cadenas.
+     */
+    public static String lcsCadena(String a, String b) {
+        int[][] tabla = new int[a.length() + 1][b.length() + 1];
         for (int i = 1; i <= a.length(); i++) {
             for (int j = 1; j <= b.length(); j++) {
-                if (tabla[i][j] > actual) {
-                    result = result + a.charAt(i-1);
-                    actual++;
+                if (a.charAt(i - 1) == b.charAt(j - 1)) {
+                    tabla[i][j] = tabla[i - 1][j - 1] + 1;
+                } else {
+                    tabla[i][j] = Math.max(tabla[i - 1][j],
+                            tabla[i][j - 1]);
                 }
             }
         }
-        System.out.println(result);
-        return tabla[a.length()][b.length()];
+
+        StringBuilder result = new StringBuilder("");
+        int i = a.length(), j = b.length();
+        while (result.length() != tabla[a.length()][b.length()]) {
+            if (a.charAt(i - 1) == b.charAt(j - 1)) {
+                result.insert(0, a.charAt(i - 1));
+                i--;
+                j--;
+            } else if (tabla[i - 1][j] > tabla[i][j - 1]) {
+                i--;
+            } else {
+                j--;
+            }
+        }
+        return result.toString();
     }
     
     /**

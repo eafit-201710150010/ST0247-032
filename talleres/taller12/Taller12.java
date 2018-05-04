@@ -35,16 +35,17 @@ public class Taller12 {
 
     public static Integer[] HillClimb(int n) {
         Integer[] tablero = new Integer[n];
-        for (int i = 0; i < tablero.length; i++) {
-            tablero[i] = 0;
-        }
         Pair menor = new Pair(Integer.MAX_VALUE, tablero.clone());
-        for (int k = 0; k < 1000; k++){
+        
+        for (int k = 0; k < 100000; k++) {
+            for (int i = 0; i < tablero.length; i++) {
+                tablero[i] = (int) Math.floor(Math.random() * n);
+            }
             for (int i = 0; i < n; i++) {
                 int posInicial = tablero[i];
                 for (int j = 0; j < n; j++) {
                     tablero[i] = j;
-                    int res = esValido(tablero);
+                    int res = reinasAtacandose(tablero);
                     if (res == 0) {
                         System.out.println(res);
                         return tablero;
@@ -65,7 +66,10 @@ public class Taller12 {
         return tablero;
     }
 
-    public static int esValido(Integer[] tablero) {
+    /**
+     * Este metodo obtiene el numero de reinas que se atacan en el momento
+     */
+    public static int reinasAtacandose(Integer[] tablero) {
         int cont = 0;
         for (int i = 0; i < tablero.length - 1; ++i) {
             for (int j = i + 1; j < tablero.length; j++) {

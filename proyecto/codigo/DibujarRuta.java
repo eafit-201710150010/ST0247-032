@@ -6,13 +6,10 @@ package ruteovehiculoselectricos;
  */
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JPanel;
-import javax.swing.JFrame;
+
 
 /**
  *
@@ -21,9 +18,14 @@ import javax.swing.JFrame;
 public class DibujarRuta extends JPanel {
 
     Pair[] coordenadas;
-    List<ArrayList<Integer>> rutas;
+    List<ArrayList<Pair<Integer,Double>>> rutas;
 
-    public DibujarRuta(Pair[] coordenadas, List<ArrayList<Integer>> rutas) {
+    /**
+     * Este es el constructor de la clase
+     * @param coordenadas Las coordenadas de todos los puntos a dibujar
+     * @param rutas Las rutas que se desean dibujar
+     */
+    public DibujarRuta(Pair[] coordenadas, List<ArrayList<Pair<Integer,Double>>> rutas) {
         this.coordenadas = coordenadas;
         this.rutas = rutas;
     }
@@ -33,15 +35,19 @@ public class DibujarRuta extends JPanel {
         DibujarLineas(g);
     }
 
-    public void DibujarLineas(Graphics g) {
+    /**
+     * Este método se encarga de dibujar las rutas
+     * @param g El componente de graphics que permite hacer los dibujos
+     */
+    private void DibujarLineas(Graphics g) {
 
-        for (List<Integer> ruta : rutas) {
+        for (List<Pair<Integer,Double>> ruta : rutas) {
             int xInicial, yInicial, xFinal, yFinal;
-            xInicial = Math.round((float) coordenadas[ruta.get(0)].first);
-            yInicial = Math.round((float) coordenadas[ruta.get(0)].second);
+            xInicial = Math.round((float) coordenadas[ruta.get(0).first].first);
+            yInicial = Math.round((float) coordenadas[ruta.get(0).first].second);
 
             for (int i = 0; i < ruta.size(); ++i) {
-                int actual = ruta.get(i);
+                int actual = ruta.get(i).first;
                 xFinal = Math.round((float) coordenadas[actual].first);
                 yFinal = Math.round((float) coordenadas[actual].second);
 

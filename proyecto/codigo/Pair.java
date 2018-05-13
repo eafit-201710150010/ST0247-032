@@ -6,10 +6,20 @@ import java.util.Objects;
  * Android.
  *
  * @author Mateo Agudelo
+ * @param <F> Primer objeto del par
+ * @param <S> Segundo objeto del par
  */
 public class Pair<F, S> {
-	public final F first;
-	public final S second;
+
+    /**
+     * Primer objeto del par
+     */
+    public final F first;
+
+    /**
+     * Segundo objeto del par
+     */
+    public final S second;
 
 	/**
 	 * Constructor de pares.
@@ -43,7 +53,7 @@ public class Pair<F, S> {
 	}
 
 	/**
-	 * Computa el hash del objeto en base al hash de cada objeto que contiene.
+	 * Computa el hash del objeto con base al hash de cada objeto que contiene.
 	 *
 	 * @return hash del par.
 	 */
@@ -63,10 +73,10 @@ public class Pair<F, S> {
 	 * Metodo utilitario para crear un par debidamente tipado. Se recomienda
 	 * usar este en vez del constructor.
 	 * 
-	 * @param first
-	 *            primer objeto del par.
-	 * @param second
-	 *            segundo objeto del par.
+     * @param <A>
+     * @param <B>
+     * @param a
+     * @param b
 	 * @return un par que contiene a 'a' y a 'b', y fue debidamente creado en
 	 *         base al tipo de objeto que estos son.
 	 */

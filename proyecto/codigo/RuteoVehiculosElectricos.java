@@ -1,9 +1,5 @@
 package ruteovehiculoselectricos;
 
-/**
- *
- * @author ljpalaciom
- */
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,8 +8,13 @@ import java.io.FileReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import javax.swing.JFrame;
 
+/**
+ *
+ * @author ljpalaciom
+ */
 public class RuteoVehiculosElectricos {
 
     int n, m, u, breaks;
@@ -26,6 +27,12 @@ public class RuteoVehiculosElectricos {
 
     double tiempoSolucion;
 
+    /**
+     * El constructor de la clase. Inicializa variables con base en el archivo
+     * que se le entrega
+     *
+     * @param filename Un archivo que contiene todos los datos del problema
+     */
     public RuteoVehiculosElectricos(String filename) {
         this.filename = filename;
         BufferedReader lector;
@@ -106,9 +113,12 @@ public class RuteoVehiculosElectricos {
 
     @Override
     public String toString() {
-        return "RuteoVehiculosElectricos{" + "r=" + r + ", speed=" + speed + ", Tmax=" + Tmax + ", Smax=" + Smax + ", st_customer=" + st_customer + ", Q=" + Q + ", tiempoSolucion=" + tiempoSolucion + '}';
+        return "RuteoVehiculosElectricos{" + "r=" + r + ", speed=" + speed + ", Tmax=" + Tmax + ", Smax=" + Smax + ", st_customer=" + st_customer + ", Q=" + Q + ", tiempoSolucion=" + tiempoSolucion + "h" +'}';
     }
 
+    /**
+     * Imprime las coordenas en un formato cartesiano (X,Y)
+     */
     public void exportarPuntosCSV() {
         try {
             PrintStream escribirCoordenadas = new PrintStream(new File("ArchivosGenerados\\Coordenadas.csv"));
@@ -122,14 +132,22 @@ public class RuteoVehiculosElectricos {
         }
     }
 
-    public void exportarRutasCSV(ArrayList<ArrayList<Integer>> rutas) {
+    /**
+     * Imprimi las coordenadas de los nodos en el orden en el que deben ser
+     * recorridos segun las rutas
+     *
+     * @param rutas Es un contenedor de rutas representadas por un arraylist de
+     * parejas donde el primer elemento indica el nodo y el segundo elemento el
+     * tiempo que se quedo en ese nodo
+     */
+    public void exportarRutasCSV(ArrayList<ArrayList<Pair<Integer, Double>>> rutas) {
         try {
             int numRuta = 0;
-            for (ArrayList<Integer> ruta : rutas) {
+            for (ArrayList<Pair<Integer, Double>> ruta : rutas) {
                 PrintStream escribirCoordenadas = new PrintStream(new File("ArchivosGenerados\\ruta" + numRuta + ".csv"));
                 escribirCoordenadas.println("X,Y");
-                for (Integer verticeActual : ruta) {
-                    escribirCoordenadas.println(coordenadas[verticeActual].first + "," + coordenadas[verticeActual].second);
+                for (Pair verticeActual : ruta) {
+                    escribirCoordenadas.println(coordenadas[(int) verticeActual.first].first + "," + coordenadas[(int) verticeActual.first].second);
                 }
                 escribirCoordenadas.close();
                 numRuta++;
@@ -139,11 +157,15 @@ public class RuteoVehiculosElectricos {
         }
     }
 
+    /**
+     * Este metodo imprime la solucion del problema
+     */
     public void solucionar() {
-        ArrayList<ArrayList<Pair<Integer, Integer>>> rutas = elVecinoMasCercanoMultiRuta();
-        System.out.println(rutas);
+        ArrayList<ArrayList<Pair<Integer, Double>>> rutas = elVecinoMasCercanoMultiRuta();
         System.out.println(this);
-        
+        boolean esCorrecto = comprobarSolucion(rutas);
+        System.out.println(esCorrecto);
+        System.out.println(rutas);
         //Dibujar
 //        int numRutas = rutas.size() / 5;
 //        for (int i = 0; i < 4; ++i) {
@@ -158,61 +180,125 @@ public class RuteoVehiculosElectricos {
 //            frame.setVisible(true);
 //        }
     }
+
     /**
-     * Este metodo es un test para verificar que la solucion es correcta. 
-     * @param rutas Es un contenedor de rutas representadas por un arraylist de parejas donde el primer elemento indica el nodo
-     * y el segundo elemento el tiempo que se quedo en ese nodo
-     * @return Verdadero si el tiempo de solucion expresado concuerda y si la bateria nunca esta por debajo de 0.
+     * Este metodo es un test para verificar que la solucion es correcta.
+     *
+     * @param rutas Es un contenedor de rutas representadas por un arraylist de
+     * parejas donde el primer elemento indica el nodo y el segundo elemento el
+     * tiempo que se quedo en ese nodo
+     * @return Verdadero si el tiempo de solucion expresado concuerda, si la
+     * bateria nunca esta por debajo de 0 y si se corrobora que se visitaron todos los clientes.
      */
-    public boolean comprobarSolucion( ArrayList<ArrayList<Pair<Integer, Integer>>> rutas){
-        return false;
+    public boolean comprobarSolucion(ArrayList<ArrayList<Pair<Integer, Double>>> rutas) {
+        double disTotal = 0.0, tiempoVisitaTotal = 0.0, tiempo;
+        int numRuta = 1;
+        HashSet<Integer> clientes = new HashSet<>();
+        for (int i = 0; i <= m; i++) {
+            clientes.add(i);
+        }
+        for (ArrayList<Pair<Integer, Double>> ruta : rutas) {
+            double dis = 0.0;
+            double tiempoVisita = 0.0;
+            double bateriaActual = Q;
+            for (int i = 0; i < ruta.size() - 1; i++) {
+                tiempoVisita += ruta.get(i).second;
+                tiempoVisitaTotal += ruta.get(i).second;
+                disTotal += mapa.getWeight(ruta.get(i).first, ruta.get(i + 1).first);
+                dis += mapa.getWeight(ruta.get(i).first, ruta.get(i + 1).first);
+                bateriaActual -= mapa.getWeight(ruta.get(i).first, ruta.get(i + 1).first) * r;
+                if (ruta.get(i).first >= m + 1) {
+                    double pendienteCarga = pendienteFuncionCarga[tipoEstacion[ruta.get(i).first - m - 1]];
+                    bateriaActual += pendienteCarga * ruta.get(i).second;
+                }
+                if (bateriaActual < 0) {
+                    System.out.println("que pato");
+                    return false;
+                }
+                clientes.remove(ruta.get(i).first);
+            }
+            System.out.println("Ruta#" + numRuta + " " + (dis / speed + tiempoVisita)*60 + " minutos");
+            if (dis / speed + tiempoVisita > 10) {
+                return false;
+            }
+            numRuta++;
+        }
+        tiempo = disTotal / speed + tiempoVisitaTotal;
+
+        if (Math.abs(tiempoSolucion - tiempo) > 0.001 || !clientes.isEmpty()) {
+            return false;
+        }
+
+        return true;
     }
-    
-    private ArrayList<ArrayList<Pair<Integer, Integer>>> elVecinoMasCercanoMultiRuta() {
-        ArrayList<ArrayList<Pair<Integer, Integer>>> solucionMenor = new ArrayList<>();
+    /**
+     * Este metedo se encarga de generar multiples rutas que son solucion al problema
+     * @return Devuelve un contenedor de rutas representadas por un arraylist de
+     * parejas donde el primer elemento indica el nodo y el segundo elemento el
+     * tiempo que se quedo en ese nodo
+     */
+    private ArrayList<ArrayList<Pair<Integer, Double>>> elVecinoMasCercanoMultiRuta() {
+        ArrayList<ArrayList<Pair<Integer, Double>>> solucionMenor = new ArrayList<>();
+
         for (int i = 0; i < 15; i++) {
-            ArrayList<ArrayList<Pair<Integer, Integer>>> rutasMultiplesTemp = new ArrayList<>();
-            boolean isVisited[] = new boolean[mapa.size];
-            double tiempoAcum = 0.0;
-            boolean todosVisitados;
-            int numRuta = 0;
-            try {
-                do {
-                    ArrayList<Pair<Integer, Integer>> rutaActual = new ArrayList<>();
-                    rutasMultiplesTemp.add(rutaActual);
-                    double distActual[] = new double[1];
-                    int numClientes[] = {0};
-                    double tiempoCarga[] = {0};
-                    float tiempoParam = (float) (i / 10. + 7.8);
-                    todosVisitados = elVecinoMasCercanoParaTSP(rutaActual, distActual, isVisited, numClientes, tiempoCarga, tiempoParam);
-                    double tiempoSolucionActual = distActual[0] / speed;
-                    tiempoSolucionActual += numClientes[0] * st_customer;
-                    tiempoSolucionActual += tiempoCarga[0];
-                    tiempoAcum += tiempoSolucionActual;
-                    numRuta++;
-                    if (numRuta > 200) {
-                        break;
+            int paramBateria = 500 * i + 1000;
+            for (int j = 0; j < 30; j++) {
+                ArrayList<ArrayList<Pair<Integer, Double>>> rutasMultiplesTemp = new ArrayList<>();
+                boolean isVisited[] = new boolean[mapa.size];
+                double tiempoAcum = 0.0;
+                boolean todosVisitados;
+                int numRuta = 0;
+                try {
+                    do {
+                        ArrayList<Pair<Integer, Double>> rutaActual = new ArrayList<>();
+                        rutasMultiplesTemp.add(rutaActual);
+                        double distActual[] = new double[1];
+                        int numClientes[] = {0};
+                        double tiempoCarga[] = {0};
+                        float tiempoParam = (float) (j / 10. + 7.8);
+                        todosVisitados = elVecinoMasCercanoParaTSP(rutaActual, distActual, isVisited, numClientes, tiempoCarga, tiempoParam, paramBateria);
+                        double tiempoSolucionActual = distActual[0] / speed;
+                        tiempoSolucionActual += numClientes[0] * st_customer;
+                        tiempoSolucionActual += tiempoCarga[0];
+                        tiempoAcum += tiempoSolucionActual;
+                        numRuta++;
+                        if (numRuta > 100) {
+                            break;
+                        }
+                    } while (!todosVisitados);
+                    if (!todosVisitados) {
+                        throw new Exception("No se pudieron visitar todos");
                     }
-                } while (!todosVisitados);
-                if (!todosVisitados) {
-                    throw new Exception("No se pudieron visitar todos");
+                    if (tiempoAcum < tiempoSolucion) {
+                        tiempoSolucion = tiempoAcum;
+                        solucionMenor = rutasMultiplesTemp;
+                    }
+
+                } catch (Exception e) {
                 }
-                if (tiempoAcum < tiempoSolucion) {
-                    tiempoSolucion = tiempoAcum;
-                    solucionMenor = rutasMultiplesTemp;
-                }
-            } catch (Exception e) {
             }
         }
 
         return solucionMenor;
     }
+    /**
+     * Este metodo está basado en el algoritmo voraz del vecino más cercano y ha sido modificado para aceptar las restricciones de este problema
+     * @param ruta Es un arraylist que se irá modificando para generar una ruta del problema.
+     * @param distAcum Es un arreglo de una sola posicion que representa la distancia que se ha acumulado en el trayecto
+     * @param isVisited Un arreglo de booleanos que representa los clientes visitados hasta el momento
+     * @param numClientes Es un arreglo de una sola posicion que representa la cantidad de clientes visitados por la presente ruta
+     * @param tiempoCarga Es un arreglo de una sola posicion que representa el tiempo total invertido en recargar el automovil
+     * @param paramTiempo  Es un parametro que cambia considerablemente el resultado de este algoritmo, para generar una mejor solucion se cambia constantemente para obtener un tiempo más óptimimo
+     * @param paramBateria Es un parametro que cambia considerablemente el resultado de este algoritmo, para generar una mejor solucion se cambia constantemente para obtener un tiempo más óptimimo
 
-    private boolean elVecinoMasCercanoParaTSP(ArrayList<Pair<Integer, Integer>> ruta, double distAcum[], boolean isVisited[], int numClientes[], double[] tiempoCarga, float paramTiempo) throws Exception {
+     * @return Verdadero si ya se visitaron todos los clientes y falso de lo contrario
+     * @throws Exception Lanza excepcion si en algun momento una ruta supera el tiempo de restriccion Tmax, o si en algun momento una ruta genera valores negativos de bateria para un auto electrico que la recorra
+     */
+    private boolean elVecinoMasCercanoParaTSP(ArrayList<Pair<Integer, Double>> ruta, double distAcum[], boolean isVisited[], int numClientes[], double[] tiempoCarga, float paramTiempo, int paramBateria) throws Exception {
         int posicionDondeEstaElDeposito = 0;
         int verticeActual = posicionDondeEstaElDeposito;
         int sucesorMenor = posicionDondeEstaElDeposito;
-        ruta.add(new Pair(verticeActual, 0));
+        ruta.add(new Pair(verticeActual, 0.0));
         boolean todosVisitados = false;
         double tiempoActual = 0.0;
         double bateriaActual = Q;
@@ -240,16 +326,18 @@ public class RuteoVehiculosElectricos {
             tiempoActual += st_customer;
             bateriaActual -= menorPeso * r;
             numClientes[0]++;
-            double menorPesoEstacion = Integer.MAX_VALUE;
-            for (int i = 0; i < u; ++i) {
-                if (mapa.getWeight(sucesorMenor, m + 1 + i) < menorPesoEstacion) {
-                    menorPesoEstacion = mapa.getWeight(verticeActual, m + 1 + i);
-                }
-            }
-            double tiempoHipotetico = tiempoActual + mapa.getWeight(sucesorMenor, posicionDondeEstaElDeposito) / speed;
-            double bateriaHipotetica = bateriaActual - menorPesoEstacion * r;
 
-            if (bateriaActual < 4000) {
+            double tiempoHipotetico = tiempoActual + mapa.getWeight(sucesorMenor, posicionDondeEstaElDeposito) / speed;
+            if (tiempoHipotetico > paramTiempo) {
+                numClientes[0]--;
+                bateriaActual += menorPeso * r;
+                tiempoActual -= menorPeso / speed;
+                tiempoActual -= st_customer;
+                distAcum[0] -= menorPeso;
+                break;
+            }
+
+            if (bateriaActual < paramBateria) {
                 numClientes[0]--;
                 bateriaActual += menorPeso * r;
                 tiempoActual -= menorPeso / speed;
@@ -259,39 +347,46 @@ public class RuteoVehiculosElectricos {
                     int posibleNuevoObjetivo = sucesorMenor;
                     sucesorMenor = verticeActual;
                     boolean alDeposito = false;
-                    boolean[] descartado = new boolean[tipoEstacion.length];
+
+                    menorPeso = Double.MAX_VALUE;
+                    double menorTiempo = Double.MAX_VALUE;
                     while (true) {
-                        menorPeso = Double.MAX_VALUE;
                         for (int i = 0; i < u; ++i) {
-                            if (!descartado[i] && mapa.getWeight(posibleNuevoObjetivo, m + 1 + i) < menorPeso) {
+                            double bateriaHipotetica = bateriaActual - (mapa.getWeight(verticeActual, m + 1 + i) * r);
+                            if (bateriaHipotetica < 10) {
+                                continue;
+                            }
+                            double tiempoYendo = mapa.getWeight(verticeActual, m + 1 + i) / speed;
+                            double pendienteCarga = pendienteFuncionCarga[tipoEstacion[i]];
+                            double tiempoCargaCompleta = (Q - bateriaActual) / pendienteCarga;
+                            double tiempoANodoHipotetico = mapa.getWeight(m + 1 + i, posibleNuevoObjetivo);
+                            double tiempoTotal = tiempoCargaCompleta + tiempoYendo + tiempoANodoHipotetico;
+                            if (tiempoTotal < menorTiempo) {
+                                menorTiempo = tiempoTotal;
                                 menorPeso = mapa.getWeight(verticeActual, m + 1 + i);
                                 sucesorMenor = m + 1 + i;
                             }
                         }
-                        if (menorPeso == Double.MAX_VALUE || sucesorMenor == verticeActual) {
+
+                        if (menorTiempo == Double.MAX_VALUE) {
                             if (posibleNuevoObjetivo == verticeActual) {
                                 alDeposito = true;
                                 break;
                             }
-                            descartado = new boolean[tipoEstacion.length];
                             posibleNuevoObjetivo = verticeActual;
-                            continue;
-                        }
-                        descartado[sucesorMenor - m - 1] = true;
-                        bateriaActual -= menorPeso * r;
-                        if (bateriaActual < 0) {
-                            bateriaActual += menorPeso * r;
                         } else {
                             break;
                         }
-
                     }
+
                     if (alDeposito) {
                         break;
                     }
                     tiempoActual += menorPeso / speed;
                     distAcum[0] += menorPeso;
+                    bateriaActual -= menorPeso * r;
                     //recargar la bateria
+
                     if (bateriaActual < 12000) {
                         double pendienteCarga = pendienteFuncionCarga[tipoEstacion[sucesorMenor - m - 1]];
                         double tiempoCargaCompleta = (Q - bateriaActual) / pendienteCarga;
@@ -300,18 +395,11 @@ public class RuteoVehiculosElectricos {
                         tiempoCarga[0] += tiempoCargaCompleta;
                         ruta.add(new Pair(sucesorMenor, tiempoCargaCompleta));
                     } else {
-                        ruta.add(new Pair(sucesorMenor, 0));
+                        ruta.add(new Pair(sucesorMenor, 0.0));
                     }
                 } else {
                     break;
                 }
-            } else if (tiempoHipotetico > paramTiempo) {
-                numClientes[0]--;
-                bateriaActual += menorPeso * r;
-                tiempoActual -= menorPeso / speed;
-                tiempoActual -= st_customer;
-                distAcum[0] -= menorPeso;
-                break;
             }
             if (sucesorMenor <= m) {
                 ruta.add(new Pair(sucesorMenor, st_customer));
@@ -319,15 +407,33 @@ public class RuteoVehiculosElectricos {
             verticeActual = sucesorMenor;
         }
         bateriaActual -= mapa.getWeight(verticeActual, posicionDondeEstaElDeposito) * r;
-        if (bateriaActual < 0) {
+        if (bateriaActual
+                < 0) {
             bateriaActual += mapa.getWeight(verticeActual, posicionDondeEstaElDeposito) * r;
             menorPeso = Double.MAX_VALUE;
+            double menorTiempo = Double.MAX_VALUE;
             for (int i = 0; i < u; ++i) {
-                if (mapa.getWeight(verticeActual, m + 1 + i) < menorPeso) {
+                double bateriaHipotetica = bateriaActual - (mapa.getWeight(verticeActual, m + 1 + i) * r);
+                if (bateriaHipotetica < 10) {
+                    continue;
+                }
+                double tiempoYendo = mapa.getWeight(verticeActual, m + 1 + i) / speed;
+                double bateriaNecesaria = mapa.getWeight(m + 1 + i, posicionDondeEstaElDeposito) * r + 10;
+                if (bateriaNecesaria > Q) {
+                    continue;
+                }
+                double pendienteCarga = pendienteFuncionCarga[tipoEstacion[i]];
+                double tiempoCargaNecesaria = (bateriaNecesaria - bateriaActual) / pendienteCarga;
+                double tiempoADeposito = mapa.getWeight(m + 1 + i, posicionDondeEstaElDeposito);
+                double tiempoTotal = tiempoCargaNecesaria + tiempoYendo + tiempoADeposito;
+
+                if (tiempoTotal < menorTiempo) {
+                    menorTiempo = tiempoTotal;
                     menorPeso = mapa.getWeight(verticeActual, m + 1 + i);
                     sucesorMenor = m + 1 + i;
                 }
             }
+
             distAcum[0] += menorPeso;
             bateriaActual -= menorPeso * r;
             tiempoActual += menorPeso / speed;
@@ -342,6 +448,9 @@ public class RuteoVehiculosElectricos {
                 bateriaActual += pendienteCarga * tiempoCargaCompleta;
                 tiempoActual += tiempoCargaCompleta;
                 tiempoCarga[0] += tiempoCargaCompleta;
+                ruta.add(new Pair(sucesorMenor, tiempoCargaCompleta));
+            } else {
+                ruta.add(new Pair(sucesorMenor, 0.0));
             }
             bateriaActual -= mapa.getWeight(verticeActual, posicionDondeEstaElDeposito) * r;
             if (bateriaActual < 0) {
@@ -351,22 +460,29 @@ public class RuteoVehiculosElectricos {
 
         distAcum[0] += mapa.getWeight(verticeActual, posicionDondeEstaElDeposito);
         tiempoActual += mapa.getWeight(verticeActual, posicionDondeEstaElDeposito) / speed;
-        if (tiempoActual > 10) {
+        if (tiempoActual
+                > 10) {
             throw new Exception("No hay solucion por tiempo");
         }
-        ruta.add(new Pair(posicionDondeEstaElDeposito, 0));
 
+        ruta.add(
+                new Pair(posicionDondeEstaElDeposito, 0.0));
         return todosVisitados;
 
     }
 
+    /**
+     * Clase principal de la clase.
+     * @param args
+     */
     public static void main(String[] args) {
         File f = new File("E:\\Documentos\\NetBeansProjects\\RuteoVehiculosElectricos\\DataSets");
         ArrayList<String> names = new ArrayList<>(Arrays.asList(f.list()));
-
-        RuteoVehiculosElectricos problema1 = new RuteoVehiculosElectricos("DataSets\\" + names.get(6));
-        problema1.solucionar();
-
+        for (int i = 0; i < 1; i++) {
+            System.out.println("Problema num "+ i + " " + names.get(i));
+            RuteoVehiculosElectricos problema1 = new RuteoVehiculosElectricos("DataSets\\" + names.get(i));
+            problema1.solucionar();
+        }
     }
 
 }

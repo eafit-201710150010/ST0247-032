@@ -12,7 +12,7 @@ import java.util.HashSet;
 import javax.swing.JFrame;
 
 /**
- *
+ * Clase principal del proyecto
  * @author ljpalaciom
  */
 public class RuteoVehiculosElectricos {

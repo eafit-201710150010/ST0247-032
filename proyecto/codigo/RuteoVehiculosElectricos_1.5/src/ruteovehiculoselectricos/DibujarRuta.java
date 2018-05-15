@@ -1,9 +1,6 @@
 package ruteovehiculoselectricos;
 
-/**
- *
- * @author ljpalaciom
- */
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -12,8 +9,8 @@ import javax.swing.JPanel;
 
 
 /**
- *
- * @author Javi
+ * Una clase que permite hacer una visualizacion de las soluciones encontradas al problema
+ * @author ljpalaciom
  */
 public class DibujarRuta extends JPanel {
 
